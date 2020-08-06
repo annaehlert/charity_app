@@ -59,6 +59,16 @@ document.addEventListener("DOMContentLoaded", function() {
     /**
      * TODO: callback to page change event
      */
+
+
+  //     var es = document.getElementsByTagName('a')
+  //     for(var i=0; i<es.length; i++){
+  //       es[i].addEventListener('click', function(e) {
+  //     e.preventDefault()
+  //     document.location.hash = e.target.getAttribute('href')
+  //   })
+  // }
+
     changePage(e) {
       e.preventDefault();
       const page = e.target.dataset.page;
