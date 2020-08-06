@@ -1,4 +1,4 @@
-
+from .settings import *  # noqa
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = ')sk1+b9wer_h4a8d#(gcfm63ycp1)l@mzf(k@v)ne-6n)n908&'
 # SECURITY WARNING: don't run with debug turned on in production!

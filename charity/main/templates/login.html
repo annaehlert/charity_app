@@ -1,35 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block header %}
+{% block header_name %}
     <header>
-      <nav class="container container--70">
-        <ul class="nav--actions">
-          <li><a href="{% url 'login' %}">Zaloguj</a></li>
-          <li class="highlighted"><a href="{% url 'registration' %}">Załóż konto</a></li>
-        </ul>
+    {% endblock %}
 
-        <ul>
-          <li><a href="{% url 'main' %}">Start</a></li>
-          <li><a href="{% url 'main' %}#steps">O co chodzi?</a></li>
-          <li><a href="{% url 'main' %}#about-us">O nas</a></li>
-          <li><a href="{% url 'main' %}#help">Fundacje i organizacje</a></li>
-          <li><a href="{% url 'main' %}#contact">Kontakt</a></li>
-        </ul>
-      </nav>
-    </header>
-{% endblock %}
 
     {% block content %}
     <section class="login-page">
       <h2>Zaloguj się</h2>
       <form action="" method="POST">
           {% csrf_token %}
-          {% include "partials/messages.html" %}
+{#          {% include "partials/messages.html" %}#}
         <div class="form-group">
-          <input type="email" name="email" placeholder="Email" />
+            {{ form.username }}
+{#          <input type="email" name="email" placeholder="Email" />#}
         </div>
         <div class="form-group">
-          <input type="password" name="password" placeholder="Hasło" />
+            {{ form.password }}
+{#          <input type="password" name="password" placeholder="Hasło" />#}
           <a href="#" class="btn btn--small btn--without-border reset-password">Przypomnij hasło</a>
         </div>
 
