@@ -1,13 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core import serializers
 from django.db.models import Sum
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
 
-from main.forms import LoginForm, RegistrationForm
-from main.models import Donation, Institution
+from main.forms import LoginForm, RegistrationForm, DonationForm
+from main.models import Donation, Institution, Category
 
 
 class LandingPage(View):
@@ -29,7 +31,104 @@ class LandingPage(View):
 
 class AddDonation(View):
     def get(self, request):
-        return render(request, 'form.html')
+        categories = Category.objects.all()
+        foundations = Institution.objects.all()
+        form = DonationForm()
+        ctx = {
+            "categories": categories,
+            "foundations": foundations,
+            "form": form
+        }
+        return render(request, 'form.html', ctx)
+
+    def post(self, request):
+        # form = DonationForm(request.POST)
+        # user = request.user
+        # if not form.is_valid():
+        #     categories = Category.objects.all()
+        #     foundations = Institution.objects.all()
+        #     form = DonationForm()
+        #     ctx = {
+        #         "categories": categories,
+        #         "foundations": foundations,
+        #         "form": form
+        #     }
+        #     return render(request, 'form.html', ctx)
+        # categories = request.POST['categories']
+        # quantity = request.POST['quantity']
+        # institution = request.POST['institution']
+        # address = request.POST['address']
+        # city = request.POST['city']
+        # zip_code = request.POST['zip_code']
+        # phone_number = request.POST['phone_number']
+        # pick_up_date = request.POST['pick_up_date']
+        # pick_up_time = request.POST['pick_up_time']
+        # pick_up_comment = request.POST['pick_up_comment']
+        # new_donation = Donation.objects.create(
+        #     quantity=quantity,
+        #     institution=Institution.objects.get(id=int(institution)),
+        #     address=address,
+        #     phone_number=phone_number,
+        #     city=city,
+        #     zip_code=zip_code,
+        #     pick_up_date=pick_up_date,
+        #     pick_up_time=pick_up_time,
+        #     pick_up_comment=pick_up_comment,
+        #     user=User.objects.get(id=user.id)
+        # )
+        # for category in categories:
+        #     new_category = Category.objects.get(id=category)
+        #     new_donation.categories.add(new_category)
+        # new_donation.save()
+        # return render(request, 'form-confirmation.html')
+
+        if request.is_ajax():
+            form = DonationForm(request.POST)
+            user = request.user
+            if form.is_valid():
+                categories = form.cleaned_data['categories']
+                quantity = form.cleaned_data['quantity']
+                institution = form.cleaned_data['institution']
+                address = form.cleaned_data['address']
+                city = form.cleaned_data['city']
+                zip_code = form.cleaned_data['zip_code']
+                phone_number = form.cleaned_data['phone_number']
+                pick_up_date = form.cleaned_data['pick_up_date']
+                pick_up_time = form.cleaned_data['pick_up_time']
+                pick_up_comment = form.cleaned_data['pick_up_comment']
+                new_donation = Donation.objects.create(
+                    quantity=quantity,
+                    institution=institution,
+                    address=address,
+                    phone_number=phone_number,
+                    city=city,
+                    zip_code=zip_code,
+                    pick_up_date=pick_up_date,
+                    pick_up_time=pick_up_time,
+                    pick_up_comment=pick_up_comment,
+                    user=user
+                )
+                for category in categories:
+                    # new_category = Category.objects.get(pk=category)
+                    new_donation.categories.add(category)
+                new_donation.save()
+                # return render(request, 'form-confirmation.html')
+                return JsonResponse({"success": "ok"})
+            return JsonResponse({"success": "form_error", "errors":f"{form.errors}"})
+        return JsonResponse({"success": "ajax_error"})
+        # categories = Category.objects.all()
+        # foundations = Institution.objects.all()
+        # form = DonationForm()
+        # ctx = {
+        #     "categories": categories,
+        #     "foundations": foundations,
+        #     "form": form
+        # }
+        # return render(request, 'form.html', ctx)
+
+
+def confirmation(request):
+    return render(request, 'form-confirmation.html')
 
 
 class Login(View):
