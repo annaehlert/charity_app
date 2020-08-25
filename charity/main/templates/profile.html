@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block header_name %}
+    <header>
+
+{% endblock %}
+{% block donation %}
+    <li><a href="{% url 'add-donation' %}" class="btn btn--without-border">Przekaż dary</a></li>
+{% endblock %}
+{% block header %}
+{% endblock %}
+{% block content %}
+    <h2>
+        PROFIL UŻYTKOWNIKA<br></h2>
+    <div class="about-us--text">
+        <p>
+            Imię: {{ user.first_name }}<br>
+            Nazwisko: {{ user.last_name }}<br>
+            E-mail: {{ user.email }}
+        </p>
+    </div>
+    {% for key, value in user_institutions.items %}
+
+        <div class="steps--container">
+            <div class="steps--item">
+                <h3>
+                    Ilość oddanych worków:<br>
+                    {{ value.0 }}
+                </h3>
+            </div>
+            <div class="steps--item">
+                <h3>
+
+                    {{ key }}
+                </h3>
+            </div>
+            <div class="steps--item">
+                <h3>
+                    {% for element in value.1 %}
+                        {{ element }}
+                    {% endfor %}
+                </h3>
+            </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+
+

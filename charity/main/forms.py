@@ -26,7 +26,7 @@ class RegistrationForm(forms.Form):
 
 
 class DonationForm(forms.Form):
-    quantity = forms.IntegerField(widget=forms.NumberInput
+    bags = forms.IntegerField(widget=forms.NumberInput
     (attrs={'id': 'quantity'}))
     categories = forms.ModelMultipleChoiceField(
         label="categories",
@@ -49,6 +49,6 @@ class DonationForm(forms.Form):
     zip_code = forms.CharField(max_length=6, widget=forms.TextInput
     (attrs={'id': 'zip_code'}))
     pick_up_date = forms.DateField(widget=forms.DateInput(attrs={'id': 'pick_up_date'}))
-    pick_up_time = forms.TimeField(widget=forms.TimeInput(attrs={'id': 'pick_up_time'}))
+    pick_up_time = forms.TimeField(widget=forms.TimeInput(attrs={'id': 'pick_up_time', 'class': 'timepicker'}))
     pick_up_comment = forms.CharField(max_length=255, required=False,
                                       widget=forms.Textarea(attrs={'id': 'pick_up_comment'}))

@@ -239,68 +239,22 @@ document.addEventListener("DOMContentLoaded", function () {
             // // TODO: Validation
             const element = document.querySelectorAll("div.form-group.form-group--checkbox input[name='categories']");
             const institutions = document.querySelectorAll("div.form-group.form-group--checkbox input[name='institution']");
-            // const element = document.getElementsByName('categories');
-            // const institutions = document.getElementsByName('organization');
-            // const description = institution.nextElementSibling;
-            //
-            //
+
             for (var i = 0; i < Object.keys(category_list).length; i++) {
                 var key = Object.keys(category_list)[i];
                 for (var j = 0; j < institutions.length; j++) {
                     var institution_value = institutions[j].value;
                     if (key === element[i].value && element[i].checked === true) {
-                        // var zmienna = Object.values(category_list)[i].includes(institution_value);
-                        // console.log(Object.values(category_list)[i]);
-                        // console.log(institution_value);
-
 
                         if (Object.values(category_list)[i].includes(Number(institution_value))) {
-                            console.log("udało się");
                             institutions[j].parentElement.parentElement.style.display = "block";
                         } else {
                             institutions[j].parentElement.parentElement.style.display = "none";
-                            console.log("Ide");
                         }
                     }
 
                 }
             }
-            //
-            // if (element[j].checked === true) {
-            //     institutions[i].parentElement.parentElement.style.display = "block";
-            // } else {
-            //     institutions[i].parentElement.parentElement.style.display = "none";
-            // }
-            //
-            // for (var i = 0; i < institutions.length; i++) {
-            //     for (var j = 0; j < element.length; j++) {
-            //         var key = Object.keys(category_list)[j];
-            //         var category_value = category_list[key];
-            //         var institution_value = institutions[i].value;
-            //
-            // $.each(category_list, function (key, value){
-            //     if(jQuery.inArray(institution_value, value) !== -1){
-            //         console.log(institution_value);
-            //     }else{
-            //         console.log('dupa');
-            //     }
-            // });
-            // $.each(category_value, function () {
-            //     if (jQuery.inArray(institution_value, category_value) !== -1) {
-            //         // if(value.includes(institution_value)){
-            //         console.log(institution_value);
-            //     }
-            // });
-            //
-            //
-            //         if (element[j].checked === true) {
-            //             institutions[i].parentElement.parentElement.style.display = "block";
-            //         } else {
-            //             institutions[i].parentElement.parentElement.style.display = "none";
-            //         }
-            //     }
-            // }
-
 
             this.slides.forEach(slide => {
                 slide.classList.remove("active");
@@ -315,7 +269,74 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // TODO: get data from inputs and show them in summary
 
-        }
+            var donation_form = document.getElementById("donation");
+            var quality_form = donation_form.elements["quantity"];
+            var institution_form = donation_form.elements["institution"];
+            var address_form = donation_form.elements["address"];
+            var city_form = donation_form.elements["city"];
+            var zip_form = donation_form.elements["zip_code"];
+            var phone_form = donation_form.elements["phone_number"];
+            var date_form = donation_form.elements["pick_up_date"];
+            var time_form = donation_form.elements["pick_up_time"];
+            var info_form = donation_form.elements["pick_up_comment"];
+            var quality_value = quality_form.value;
+            var institution_val = institution_form.value;
+            var address_val = address_form.value;
+            var city_val = city_form.value;
+            var zip_val = zip_form.value;
+            var phone_val = phone_form.value;
+            var date_val = date_form.value;
+            var time_val = time_form.value;
+            var info_val = info_form.value;
+            var bags = document.getElementById("bags");
+            var institution_name = document.getElementById("institution_name");
+            var address_name = document.getElementById("address_id");
+            var city_name = document.getElementById("city_id");
+            var zip_name = document.getElementById("zip_id");
+            var phone_name = document.getElementById("phone_id");
+            var date_name = document.getElementById("date_id");
+            var time_name = document.getElementById("time_id");
+            var info_name = document.getElementById("info_id");
+
+            if (Number(quality_value) === 1) {
+                bags.innerHTML = `${quality_value} worek`;
+
+            } else if (5 < Number(quality_value) < 1) {
+                bags.innerHTML = `${quality_value} worki`;
+
+            } else {
+                bags.innerHTML = `${quality_value} worków`;
+
+            }
+
+for (var y = 0; y < Object.keys(institution_list).length; y++) {
+                var institution_id = Object.keys(institution_list)[y];
+                if(Number(institution_val) === Number(institution_id)){
+                    console.log(institution_list[institution_id]);
+                institution_name.innerHTML = `Dla ${institution_list[institution_id]}`;}
+}
+address_name.innerHTML = `${address_val}`;
+city_name.innerHTML = `${city_val}`;
+zip_name.innerHTML = `${zip_val}`;
+phone_name.innerHTML = `${phone_val.slice(0, 3)}` + " " + `${phone_val.slice(3, 6)}` + " " + `${phone_val.slice(6, 10)}`;
+date_name.innerHTML = `${date_val}`;
+time_name.innerHTML = `${time_val}`;
+if(info_val === ""){
+    info_name.innerHTML = "Brak komentarza";
+}else{
+    info_name.innerHTML = `${info_val}`;
+}
+
+
+
+    }
+
+
+
+
+
+
+
 
         /**
          * Submit form
@@ -332,21 +353,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 url: "http://127.0.0.1:8000/add-donation/",
                 type: "POST",
                 dataType: 'json',
-                data: {
-                // $('form#donation').serialize()
+                data:
+                $('#donation').serialize()
 
-                categories: $('#categories').val(),
-                quantity: $('#quantity').val(),
-                institution: $('#institution').val(),
-                address: $('#address').val(),
-                city: $('#city').val(),
-                zip_code: $('#zip_code').val(),
-                phone_number: $('#phone_number').val(),
-                pick_up_date: $('#pick_up_date').val(),
-                pick_up_time: $('#pick_up_time').val(),
-                pick_up_comment: $('#pick_up_comment').val(),
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
-            }
+                // categories: $('[name="categories"]').val(),
+                // quantity: $('#quantity').val(),
+                // institution: $('#institution').val(),
+                // address: $('#address').val(),
+                // city: $('#city').val(),
+                // zip_code: $('#zip_code').val(),
+                // phone_number: $('#phone_number').val(),
+                // pick_up_date: $('#pick_up_date').val(),
+                // pick_up_time: $('#pick_up_time').val(),
+                // pick_up_comment: $('#pick_up_comment').val(),
+                // csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+
             }).done(function (response) {
                 if (response.success === "ok"){
                     window.location = "http://127.0.0.1:8000/add-donation/confirmation/"

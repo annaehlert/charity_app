@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core import serializers
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -16,7 +16,7 @@ class LandingPage(View):
     def get(self, request):
         # zliczenie ilości oddanych worków, suma wyciągnięta z bazy danych, aggregate(Sum()) zwraca słownik
         donation = Donation.objects.aggregate(Sum('quantity'))
-        #zliczenie ilości fundacji, którym została udzielona pomoc
+        # zliczenie ilości fundacji, którym została udzielona pomoc
         institution_number = Institution.objects.all().count()
         institutions = Institution.objects.all()
         user = request.user
@@ -29,7 +29,7 @@ class LandingPage(View):
         return render(request, 'index.html', ctx)
 
 
-class AddDonation(View):
+class AddDonation(View, LoginRequiredMixin):
     def get(self, request):
         categories = Category.objects.all()
         foundations = Institution.objects.all()
@@ -87,7 +87,7 @@ class AddDonation(View):
             user = request.user
             if form.is_valid():
                 categories = form.cleaned_data['categories']
-                quantity = form.cleaned_data['quantity']
+                quantity = form.cleaned_data['bags']
                 institution = form.cleaned_data['institution']
                 address = form.cleaned_data['address']
                 city = form.cleaned_data['city']
@@ -114,7 +114,10 @@ class AddDonation(View):
                 new_donation.save()
                 # return render(request, 'form-confirmation.html')
                 return JsonResponse({"success": "ok"})
-            return JsonResponse({"success": "form_error", "errors":f"{form.errors}"})
+            return JsonResponse(
+                {"success": "form_error",
+                 "errors": f"{form.errors}"}
+            )
         return JsonResponse({"success": "ajax_error"})
         # categories = Category.objects.all()
         # foundations = Institution.objects.all()
@@ -127,6 +130,7 @@ class AddDonation(View):
         # return render(request, 'form.html', ctx)
 
 
+@login_required
 def confirmation(request):
     return render(request, 'form-confirmation.html')
 
@@ -135,8 +139,10 @@ class Login(View):
     def get(self, request):
         if request.user.id is not None:
             return redirect('main')
-        return render(request, 'login.html',
-        {"form": LoginForm()})
+        return render(request,
+                      'login.html',
+                      {"form": LoginForm()}
+                      )
 
     def post(self, request):
         form = LoginForm(request.POST)
@@ -164,14 +170,18 @@ class Register(View):
         if request.user.id is not None:
             return redirect('main')
 
-        return render(request, 'register.html',
-                      {"form": RegistrationForm()})
+        return render(request,
+                      'register.html',
+                      {"form": RegistrationForm()}
+                      )
 
     def post(self, request):
         form = RegistrationForm(request.POST)
         if not form.is_valid():
-            return render(request, 'register.html',
-                          {"form": form})
+            return render(request,
+                          'register.html',
+                          {"form": form}
+                          )
         email = form.cleaned_data['email']
         first_name = form.cleaned_data['name']
         last_name = form.cleaned_data['surname']
@@ -179,12 +189,16 @@ class Register(View):
         password_2 = form.cleaned_data['password2']
         if password != password_2:
             messages.add_message(request, messages.WARNING, 'Błędnie powtórzone hasło. Spróbuj jeszcze raz.')
-            return render(request, 'register.html',
-                          {"form": form})
+            return render(request,
+                          'register.html',
+                          {"form": form}
+                          )
         if User.objects.filter(email=email).exists():
             messages.add_message(request, messages.WARNING, 'Profil o podanym emailu już istnieje.')
-            return render(request, 'register.html',
-                          {"form": form})
+            return render(request,
+                          'register.html',
+                          {"form": form}
+                          )
         User.objects.create_user(username=email, email=email, password=password, first_name=first_name,
                                  last_name=last_name)
         return redirect('login')
@@ -194,3 +208,29 @@ class Register(View):
 def logout_view(request):
     logout(request)
     return redirect('main')
+
+
+# wyszukanie i wyświetlenie wszystkich datków danego użytkownika
+class ProfileView(View, LoginRequiredMixin):
+    def get(self, request):
+        user = request.user
+        user_institutions = {}
+        donations = Donation.objects.filter(user=user)
+        institutions = Institution.objects.all()
+        for donation in donations:
+            for institution in institutions:
+                if donation.institution == institution:
+                    user_donation_quantity = donations.filter(institution=donation.institution)
+                    donation_quantity = user_donation_quantity.aggregate(Sum('quantity'))
+                    if donation.institution.name not in user_institutions.keys():
+                        user_institutions[donation.institution.name] = [
+                            donation_quantity.get('quantity__sum'),
+                            [category.name for category in donation.categories.all()]
+                        ]
+
+        ctx = {
+            "user": user,
+            "donations": donations,
+            "user_institutions": user_institutions
+        }
+        return render(request, 'profile.html', ctx)

@@ -13,10 +13,35 @@
         {% endfor %}
         }
         ;
+        $(function () {
+            $('.timepicker').timepicker({
+                show2400: true,
+                timeFormat: 'HH:mm',
+                interval: 60,
+                minTime: '08:00',
+                maxTime: '18:00',
+                defaultTime: '08:00',
+                startTime: '08:00',
+                dynamic: false,
+                dropdown: true,
+                scrollbar: true
+            });
 
-  $( function() {
-    $( "#pick_up_date" ).datepicker();
-  } );
+
+        });
+
+
+        $(function () {
+            $("#pick_up_date").datepicker();
+        });
+        var institution_list = {
+        {% for institution in foundations %}
+            {{ institution.pk }}
+            :
+            '{{ institution.name }}',
+        {% endfor %}
+        }
+        ;
 
     </script>
 {% endblock %}
@@ -79,21 +104,20 @@
                 <!-- STEP 1: class .active is switching steps -->
                 <div data-step="1" class="active">
                     <h3>Zaznacz co chcesz oddać:</h3>
-{#                    {% for category in categories %}#}
+                    {#                    {% for category in categories %}#}
                     {% for category in form.categories.field.queryset %}
                         <div class="form-group form-group--checkbox">
                             <label>
 
 
-{#                                <div class="form-group form-group--checkbox">#}
-{#                                <label>#}
-{#    <span class="checkbox"></span>#}
-{#                                <span class="description">{{ category }}</span>#}
-{#                            </label>#}
-{#                        </div>#}
-{#{% endfor %}#}
+                                {#                                <div class="form-group form-group--checkbox">#}
+                                {#                                <label>#}
+                                {#    <span class="checkbox"></span>#}
+                                {#                                <span class="description">{{ category }}</span>#}
+                                {#                            </label>#}
+                                {#                        </div>#}
+                                {#{% endfor %}#}
                                 <input
-                                        id="categories"
                                         type="checkbox"
                                         name="{{ form.categories.name }}"
                                         value="{{ category.pk }}"
@@ -121,7 +145,7 @@
                     <div class="form-group form-group--inline">
                         <label>
                             Liczba 60l worków:
-{#                            {{ form.quantity }}#}
+                            {#                            {{ form.quantity }}#}
                             <input id="quantity" type="number" name="bags" step="1" min="1"/>
                         </label>
                     </div>
@@ -140,7 +164,8 @@
                         <div class="form-group form-group--checkbox" style="display: block">
                             <label>
 
-                                <input id="institution" type="radio" name="{{ form.institution.name }}" value="{{ institution.pk }}"/>
+                                <input id="institution" type="radio" name="{{ form.institution.name }}"
+                                       value="{{ institution.pk }}"/>
                                 <span class="checkbox radio"></span>
                                 <span class="description">
                   <div class="title">{{ institution.name }}</div>
@@ -176,14 +201,14 @@
                             <div class="form-group form-group--inline">
                                 <label> Ulica
                                     {{ form.address }}
-{#                                    <input id="address" type="text" name="address"/>#}
+                                    {#                                    <input id="address" type="text" name="address"/>#}
                                 </label>
                             </div>
 
                             <div class="form-group form-group--inline">
                                 <label> Miasto
                                     {{ form.city }}
-{#                                    <input id="city" type="text" name="city"/>#}
+                                    {#                                    <input id="city" type="text" name="city"/>#}
                                 </label>
                             </div>
 
@@ -191,7 +216,7 @@
                                 <label>
                                     Kod pocztowy
                                     {{ form.zip_code }}
-{#                                    <input id="zip_code" type="text" name="postcode"/>#}
+                                    {#                                    <input id="zip_code" type="text" name="postcode"/>#}
                                 </label>
                             </div>
 
@@ -199,7 +224,7 @@
                                 <label>
                                     Numer telefonu
                                     {{ form.phone_number }}
-{#                                    <input id="phone_number" type="text" name="phone"/>#}
+                                    {#                                    <input id="phone_number" type="text" name="phone"/>#}
                                 </label>
                             </div>
                         </div>
@@ -209,14 +234,15 @@
                             <div class="form-group form-group--inline">
                                 <label> Data
                                     {{ form.pick_up_date }}
-{#                                    <input id="pick_up_date" type="date" name="data"/>#}
+                                    {#                                    <input id="pick_up_date" type="date" name="data"/>#}
                                 </label>
                             </div>
+
 
                             <div class="form-group form-group--inline">
                                 <label> Godzina
                                     {{ form.pick_up_time }}
-{#                                    <input id="pick_up_time" type="time" name="time"/>#}
+                                    {#                                    <input id="pick_up_time" type="time" name="time"/>#}
                                 </label>
                             </div>
 
@@ -224,7 +250,7 @@
                                 <label>
                                     Uwagi dla kuriera
                                     {{ form.pick_up_comment }}
-{#                                    <textarea id="pick_up_comment" name="more_info" rows="5"></textarea>#}
+                                    {#                                    <textarea id="pick_up_comment" name="more_info" rows="5"></textarea>#}
                                 </label>
                             </div>
                         </div>
@@ -245,14 +271,14 @@
                             <ul>
                                 <li>
                                     <span class="icon icon-bag"></span>
-                                    <span class="summary--text"
-                                    >4 worki ubrań w dobrym stanie dla dzieci</span
+                                    <span id="bags" class="summary--text"
+                                    > worki ubrań w dobrym stanie dla dzieci</span
                                     >
                                 </li>
 
                                 <li>
                                     <span class="icon icon-hand"></span>
-                                    <span class="summary--text"
+                                    <span id="institution_name" class="summary--text"
                                     >Dla fundacji "Mam marzenie" w Warszawie</span
                                     >
                                 </li>
@@ -263,19 +289,19 @@
                             <div class="form-section--column">
                                 <h4>Adres odbioru:</h4>
                                 <ul>
-                                    <li>Prosta 51</li>
-                                    <li>Warszawa</li>
-                                    <li>99-098</li>
-                                    <li>123 456 789</li>
+                                    <li id="address_id">Prosta 51</li>
+                                    <li id="city_id">Warszawa</li>
+                                    <li id="zip_id">99-098</li>
+                                    <li id="phone_id">123 456 789</li>
                                 </ul>
                             </div>
 
                             <div class="form-section--column">
                                 <h4>Termin odbioru:</h4>
                                 <ul>
-                                    <li>13/12/2018</li>
-                                    <li>15:40</li>
-                                    <li>Brak uwag</li>
+                                    <li id="date_id">13/12/2018</li>
+                                    <li id="time_id">15:40</li>
+                                    <li id="info_id">Brak uwag</li>
                                 </ul>
                             </div>
                         </div>
